@@ -2,9 +2,12 @@
   "name": "indiecoder-fastify-prisma-ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:build": "tsc -w --project tsconfig.json && npx -p tsconfig.json",
+    "build:live": "nodemon --watch src/ --exec ts-node --esm src/main.ts --verbose",
+    "start": "npm run build:live"
   },
   "author": "",
   "license": "ISC",
