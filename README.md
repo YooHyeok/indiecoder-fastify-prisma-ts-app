@@ -30,6 +30,56 @@
 </details>
 <br>
 
+# TypeScript 기초 1
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+```js
+let num1 = 10
+let num2 = 20
+console.log(num1 + num2) // 결과: 30
+```
+위 코드를 보면 num1과 num2는 모두 정수 형으로 인식이 되므로 로그로 출력시 결과값이 30으로 출력된다.  
+
+```js
+let num = 10
+let text = '테스트'
+console.log(num + text) // 결과: 10테스트
+```
+위 코드의 경우 text는 문자 타입으로 할당되어 실제 결과는 문자열 연산으로 적용되어 10테스트 라는 결과를 얻게 된다.  
+위와 같이 자바스크립트는 타입을 특정하지 않아도 동적으로 타입이 지정되는 방식의 언어이다.   
+
+## 타입 명시가 필요한 이유
+
+- 자바스크립트 예제
+  ```js
+  function typeTest1(param) {
+    Math.round(param)
+  }
+
+  typeTest('1')
+  ```
+  typeTest() 함수는 param이라는 매개변수를 갖고, 전달된 param은 숫자형 타입만 적용되는 Math.round()를 이용하여 반올림을 계산한다.  
+  누군가가 testType() 함수 인자에 문자를 전달하여 호출할 경우 오류가 발생하게 된다.  
+  문제는 해당 오류가 코드를 실행해야 발생한다는 것이다.
+
+- 타입스크립트 예제
+  ```ts
+  function typeTest2(param: number) {
+    Math.round(param)
+  }
+  typeTest2('1') 
+  ```
+
+반면, 타입스크립트는 매개변수 param을 number타입으로 지정할 수 있다.  
+또한 함수 호출시 매개변수에 문자를 입력하여 호출할 경우 코드를 작성할 때 오류가 발생하게 된다.  
+즉, 코드를 서버 등에 올리기 전에 개발 단계에서 바로 오류를 확인할 수 있게 된다.  
+
+
+</details>
+<br>
+
 # 프로젝트 세팅
 <details>
 <summary>접기/펼치기</summary>
@@ -193,7 +243,7 @@ build:live를 명령을 실행시킨다
 
 ### fastify 테스트 API 코드 구성
 - src/main.ts
-  ```
+  ```js
   import Fasitfy from "fastify";
 
   const fastify = Fasitfy()
