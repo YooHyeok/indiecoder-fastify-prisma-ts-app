@@ -135,6 +135,62 @@ function fn(param: Student | Worker): void {}
 위 예제의 경우 fn 함수의 매개변수 param과 같이 Student 혹은 Worker 타입 중 하나의 타입을 가지게 설정할 수 있다.  
 즉, 단순 원자타입이 아닌 사용자가 정의한 타입 역시도 union을 이용하여 여러 타입 중 하나를 갖게할 수 있다.  
 
+## interface
+타입을 지정하는 방법 중에는 interface라는 것도 있다.  
+```ts
+interface Person {
+  name: string
+  age: number
+}
+```
+사용방법은 위와같이 type키워드 대신 interface 키워드로 정의하면 된다.  
+type과는 다르게 할당하는 기호 `=`을 사용하지 않는다.  
+
+interface는 type과 비슷하지만 타입과 다르게 속성의 확장이 가능하다.  
+
+### interface의 확장
+```ts
+interface Person {
+  name: string
+  age: number
+}
+interface Student extends Person {
+  /* Person의 name, age 확장 */
+  major: string
+}
+interface Worker extends Person {
+  /* Person의 name, age 확장 */
+  skill: string
+}
+```
+위 예제와 같이 extends라는 키워드를 사용하여 확장할 수 있다.  
+Person타입을 extends 함으로써 Student와 Worker타입 모두 name과 age를 기본으로 갖되,  
+Student는 major, Worker는 skill을 추가로 받는 형태가 되는 것이다.  
+
+#### 다중 확장
+```ts
+interface Programmer extends Worker, Student {}
+```
+참고로 extends는 하나의 타입이 아닌 여러 타입을 extends 해서 받아올 수 있다.  
+위 예제의 경우 name, age, major, skill을 기본으로 갖게 된다.  
+
+#### type과 함께 사용 가능
+```ts
+type Person = {
+  name: string
+  age: string
+}
+interface Student extends Person {
+  /* Person의 name, age 확장 */
+  major: string
+}
+interface Worker extends Person {
+  /* Person의 name, age 확장 */
+  skill: string
+}
+```
+첫번째 예제와 동일하게 Person의 name, age를 기본으로 갖게 된다.  
+
 
 # 프로젝트 세팅
 <details>
