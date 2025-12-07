@@ -30,7 +30,7 @@
 </details>
 <br>
 
-# TypeScript 기초 1
+# TypeScript 기초 1 - Type과 Type정의
 <details>
 <summary>접기/펼치기</summary>
 <br>
@@ -76,9 +76,35 @@ console.log(num + text) // 결과: 10테스트
 또한 함수 호출시 매개변수에 문자를 입력하여 호출할 경우 코드를 작성할 때 오류가 발생하게 된다.  
 즉, 코드를 서버 등에 올리기 전에 개발 단계에서 바로 오류를 확인할 수 있게 된다.  
 
+## 기본 타입(원자성)
+- number  
+  정수 타입
+- string  
+  문자열 타입
+- boolean  
+  true/false (참/거짓) 타입
+- null  
+  값이 비어있는 타입
+- undefined  
+  정의되지 않은 타입
+- any  
+  어떠한 타입이든 모든 값을 받을 수 있는 치트키와 같은 타입  
+- never
+  아무 값도 가질 수 없는 자주사용되지 않는 특별한 타입  
+- void  
+  함수에서 반환값 즉, 리턴이 필요 없을 때 사용하는 타입  
+- object  
+  객체형태의 타입이다.  
 
-</details>
-<br>
+위 타입들은 더이상 쪼개질 수 없는 원자의 성격을 가지며, 아래와 같이 타입을 지정할 수 있다.  
+```ts
+let num: number
+let str: string
+let bool: boolean
+let no: null
+let anyValue: any
+```
+
 
 # 프로젝트 세팅
 <details>
