@@ -191,6 +191,27 @@ interface Worker extends Person {
 ```
 첫번째 예제와 동일하게 Person의 name, age를 기본으로 갖게 된다.  
 
+## 함수에서의 Type
+함수에서는 매개변수와 반환값을 타입으로 지정할 수 있다.  
+```ts
+function sum(num1: number, num2: number): number {
+  return num1 + num2
+}
+```
+위 예제를 보면 매개변수 num1과 num2를 각각 number타입으로 지정하고
+함수 내부에서 num1과 num2를 연산하여 반환하므로 해당 타입인 number 타입을 지정했다.  
+
+### void 반환 타입
+```ts
+function sum(num1: number, num2: number): void {
+  console.log(num1 + num2)
+}
+```
+위 예제와 같이 주로 console.log()와 같이 로그를 출력하거나, 다른 함수를 출력하는 경우 등 return 하지 않을 때 void 타입을 지정한다.  
+</details>
+<br>
+
+
 
 # 프로젝트 세팅
 <details>
