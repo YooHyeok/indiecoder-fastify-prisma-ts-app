@@ -212,6 +212,76 @@ function sum(num1: number, num2: number): void {
 <br>
 
 
+# TypeScript 기초 2 - 제네릭과 타입가드
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+## Generics
+
+### generic 함수
+```ts
+function logText(text: string | number) {
+  console.log(text)
+  return text
+}
+
+const num = logText(1)
+const a = logText('a')
+
+a.toUpperCase(); // 오류 발생
+```
+위 예제와 같이 함수의 특정 매개변수에 한개 이상의 타입이 올 수 있게 만들어야 하는 경우가 있다.  
+이때 타입스크립트에서 제공하는 union을 이용할 수 있으나 union으로 지정할 경우 number 즉 숫자 타입을 선택하고 소문자를 대문자로 치환하는 toUpperCase()와 같은 문자형을 위한 기능을 사용한다면 오류가 발생한다.  
+toUpperCase가 문자열에만 적용이 되는데 `string | number`와 같이 union 타입으로 지정할 경우 문자가 될 수도 있고 숫자가 될 수도 있어 정확한 타입 체크가 어렵기 때문이다.  
+물론 이런 경우 필요에 따라 함수를 여러개 만드는 방법 도 있지만, 완벽한 정답이라고 보기엔 어렵다.  
+이런 경우에 편리하게 사용할 수 있는 기능이 타입스크립트의 generic이다.
+
+```ts
+function 함수명<타입변수> (매개변수: 타입변수) : 반환타입 {}
+```
+위와같이 함수명 옆에 홑화살괄호를 활용하여 `<타입변수>` 형태로 타입 변수를 정의하면 된다.  
+그리고 매개변수나 리턴 값을 지정한 타입변수로 이용하여 타입을 지정할 수 있다.  
+즉, 타입을 함수의 매개변수처럼 적용해 설정할 수 있게 되는 것이다.  
+
+제네릭 타입의 경우 호출이 필요한 타입으로 변경이 가능하다.  
+```ts
+function identiiy<T>(arg: T): T {
+  return arg;
+}
+identity<string>('hi')
+identity<number>(10)
+identity<boolean>(true)
+```
+위 예제와 같이 identity 함수 호출 예를 보면 상황에 맞게 인자값에 해당하는 타입을 설정한 것을 볼 수 있다.  
+첫 번째는 string 형태의 인자를, 두 번째는 정수를, 세 번째는 boolean타입을 설정하고 해당 타입에 맞는 인자를 넣어 호출하고 있다.  
+참고로 예로 든 변수 T의 경우 단일문자를 사용해도 되지만 실제 사용할 때는 변수나 함수명처럼 구체적으로 사용하는 것이 좋다.  
+
+generic을 이용하면 아래와 같이 함수를 호출할 때 타입을 지정할 수 있으므로 어떤 함수의 매개변수나 리턴값이 여러가지 타입을 가질 수 있을 때 사용하면 매우 유용하다.  
+```ts
+function logText<T>(text: T): T {
+ console.log(text)
+ return text;
+}
+
+const str = logText<string>('abc') // 타입을 string 으로 지정
+str.toUpperCase() // 정상작동
+```
+#### Generic함수 - 배열
+또 배열의 경우 아래와 같이 `T[]` 형태로 배열 기호를 사용하거나 `Array<T>` 형태처럼 Array를 직접 써서 표현할 수도 있다.  
+```ts
+function identity<T>(arg: T[]): T[] {
+  return arg.length
+}
+function identity<T>(arg: Array<T>): Array<T> {
+  return arg.length
+}
+```
+참고로 이때 만약 length와 같은 배열에 이쓴 기능의 경우 generic에 배열을 표시하지 않으면 오류가 발생하게 된다.  
+
+</details>
+<br>
+
 
 # 프로젝트 세팅
 <details>
