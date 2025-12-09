@@ -279,9 +279,56 @@ function identity<T>(arg: Array<T>): Array<T> {
 ```
 참고로 이때 만약 length와 같은 배열에 이쓴 기능의 경우 generic에 배열을 표시하지 않으면 오류가 발생하게 된다.  
 
+### interface에서의 Generic
+또 인터페이스에서도 제네릭을 사용할 수 있다.  
+```ts
+interface GenericFn<T> {
+  (arg: T): T
+}
+function identity<T>(arg: T): T {
+  return arg
+}
+let myIdentity: GenericFn<number> = identity
+myIdentity(15);
+```
+위 문법은 함수 시그니처를 인터페이스로 정의하는 문법이다.  
+즉, 인터페이스를 활용하여 함수 자체의 타입(형태)를 정의한다.  
+T를 받아 T를 반환하는 함수여야만 한다는 규칙을 정의하였다.  
+즉, 여러 함수들이 동일한 규격(시그니처)를 따르게 하기 위함이다.  
+이와같이 사용할 경우 함수의 타입을 재사용할 수 있게 된다.  
+
+
+자바의 Functional Interface와 동일하다고 생각하면 된다.
+
+#### 자바의 Funcitonal interface
+```java
+interface GenericFn<T> {
+  T fn(T arg)
+}
+
+public class Function {
+  public static <T> T identity(T arg) {
+    return arg;
+  }
+}
+
+GenericFn<Integer> myIdentity = Function::identity
+myIdentity.fn(15);
+```
+
+### Promise
+서버와 통신등에 쓰이는 Promise의 경우 generic이 기본적으로 사용된다.  
+```ts
+async function test<T>(arg: T): Promise<T> {
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+  return arg;
+}
+```
+
+generic은 특정 함수에서 매개변수나 리턴값이 상황에 따라 동적으로 타입이 달라지는 경우에 사용하면 상당히 유용하게 사용할 수 있다.  
+
 </details>
 <br>
-
 
 # 프로젝트 세팅
 <details>
