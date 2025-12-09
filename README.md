@@ -339,6 +339,46 @@ readArticleOne의 경우도 리턴 타입이 비어있으나, 실제로 메소�
 타입 추론은 상당히 강력한 기능이다.  
 이렇게 추론이 가능한 코드에서는 명시적으로 타입을 지정하지 않아도 된다는 것을 의미하고, 잘만 사용한다면 개발의 효율성을 높일수가 있다.  
 
+## 타입가드
+타입 가드는 말 그대로 원하지 않는 타입에 의한 어떤 오류가 발생하지 않게 하는 기능이다.  
+```ts
+function testGuard(value: number | string) {
+  value.toFixed() // 오류
+}
+testGuard('일')
+```
+매개변수가 number 또는 string인 경우 즉, 멀티(유니온)타입일 경우로 예를 들어 본다.  
+함수 내부에서는 전달받은 value를 반올림하는 toFixed()를 실행하게 된다.  
+만약 문자타입의 값을 전달하여 함수를 호출할 경우 코드상의 오류가 발생하게 된다.  
+이유는 숫자형 타입만 toFixed()로 반올림이 가능하기 때문이다.  
+
+```ts
+function testGuard(value: number | string) {
+  if (typeof value = 'number') {
+    value.toFixed()
+  }
+}
+testGuard('일')
+```
+위와같이 if와 typeof를 이용하여 사용되는 값이 특정 타입일 때만 어떤 기능이 실행되도록 조건 코드를 작성해야한다.  
+```ts
+type Dog = {
+  name: string
+  color: string
+}
+function testGuard(value: Dog) {
+  if ('color' in value) {
+    console.log(`color는 ${value.color} 입니다.`)
+  }
+}
+```
+위 예제와 같이 Dog 이라는 직접 정의한 타입에서 특정 타입 확인이 필요할 경우 in을 사용해서 어떤 속성이 있는지 확인할 수도 있다.  
+value에 color타입이 있는지 체크한다.  
+타입 가드의 경우 정확하게 지켜지지 않는다면 오류가 출력되기 때문에 매개변수로 사용되는 어떤 값 등이 가변적일 때에는 타입 가드를 신경써야 한다.  
+
+</details>
+<br>
+
 </details>
 <br>
 
