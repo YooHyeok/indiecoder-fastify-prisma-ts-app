@@ -327,6 +327,18 @@ async function test<T>(arg: T): Promise<T> {
 
 generic은 특정 함수에서 매개변수나 리턴값이 상황에 따라 동적으로 타입이 달라지는 경우에 사용하면 상당히 유용하게 사용할 수 있다.  
 
+## 타입 추론
+
+[코드 레퍼런스](https://github.com/freeseamew/SLOG-FASTIFY-PRISMA-TS-STUDY/blob/master/src/services/articleService.ts)
+
+![alt text](docs/images/image.png)  
+createArticle의 경우 코드상으로는 리턴타입이 비어있으나 Promise 형태로 리턴 타입을 출력해준다.  
+![alt text](docs/images/image-1.png)  
+readArticleOne의 경우도 리턴 타입이 비어있으나, 실제로 메소드위에 마우스를 올릴경우 반환 타입을 출력해준다.  
+즉, 코드상으로 표현되는 타입이 명확하다면 타입을 지정하지 않아도 타입스크립트가 타입을 추론해 낸다.  
+타입 추론은 상당히 강력한 기능이다.  
+이렇게 추론이 가능한 코드에서는 명시적으로 타입을 지정하지 않아도 된다는 것을 의미하고, 잘만 사용한다면 개발의 효율성을 높일수가 있다.  
+
 </details>
 <br>
 
