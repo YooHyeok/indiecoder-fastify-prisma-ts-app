@@ -379,6 +379,70 @@ value에 color타입이 있는지 체크한다.
 </details>
 <br>
 
+# Rest API
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+웹 개발에서 제일 많이 사용되는 통신 방법이다.  
+![alt text](docs/images/image-2.png)
+URL 주소를 통해 요청을 하고 서버로부터 응답을 받게되는 구조를 갖는다.  
+또한 URL 주소와 함께 아래 가지 핵심 메소드를 이용하여 요청을 하게 된다.
+
+## 통신 메소드
+- get: 데이터 호출
+- post: 데이터 삽입
+- put: 데이터 수정
+- delete: 데이터 삭제
+
+예를들어 아래와 같이 3000번 포트를 가지는 서버가 있다고 가정해본다.  
+- 인증: localhost:3000/auth
+- 게시글: localhost:3000/articles
+- 좋아요: localhost:3000/likes
+- 코멘트: localhost:3000/comments
+
+article과 같은 정보를 보내 필요한 요청을 하게 되고 또 요청을 할때는 앞서 설명한 메소드를 사용하여 정보를 주고 받는다고 가정해본다.
+- localhost:3000/articles
+  - 조회: get
+  - 입력: post
+  - 수정: put
+  - 삭제: delete
+
+### `localhost:3000/articles`의 `GET` 요청 결과 예
+아래와 같이 JSON 형태의 데이터를 받을 수 있으며, 해당 데이터를 바탕으로 frontend나 다양한 서비스를 확장해서 만들 수 있게 된다.  
+```json
+{
+  "totalPageCount": 5,
+  "articleList": [
+    {
+      "id": 50,
+      "content": "content_50",
+      "likeCount": 0,
+      "commentCount": 0,
+      "userId": 1,
+      "userEmail": "user1@email.com",
+      "likeMe": false,
+      "createdAt": "Sun Sep 17 2023 17:31:14 GMT+0900 (대한민국 표준시)"
+    },
+    /* 생략 */
+  ]
+}
+```
+
+### URL Paramenter
+요청에 필요한 어떤 값을 서버에 전달할 때 가장 기본적인 방법으로 URL에 특정 구역에 해당하는 값을 설정해서 서버로 전달하는 방법이다.  
+`주소/articles/{articleId}` → `localhost:8083/articles/11`
+위와같이 아이디 등의 데이터를 URL에 위치시킨 후 서버로 전달할 수 있다.  
+위 방법을 **Path Variable**이라고 부른다.  
+
+비슷한 방법으로 **Query String**도 있다.  
+`주소/articles?pageNumber=1&mode=ALL` → `localhost:8083/articles?pageNumber=1&mode=ALL`  
+
+위와 같이 물음표 다음에 필요한 값들을 넣어주면 되고 여러개의 값을 넘겨야 한다면 &(앤드) 기호를 통해 값들을 구분하여 다양한 여러개의 값들을 서버로 전달할 수 있다.  
+
+또한 http 프로토콜에서 제공하는 헤더(Http Header) 등을 통해 토큰정보 등을 넣어 보낼수도 있고, 입력 폼 값 등의 경우에도 역시 바디(Http Body) 영역에 값을 실어 전달할 수 있다.  
+
+
 </details>
 <br>
 
