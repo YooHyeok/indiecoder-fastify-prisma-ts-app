@@ -442,6 +442,43 @@ article과 같은 정보를 보내 필요한 요청을 하게 되고 또 요청�
 
 또한 http 프로토콜에서 제공하는 헤더(Http Header) 등을 통해 토큰정보 등을 넣어 보낼수도 있고, 입력 폼 값 등의 경우에도 역시 바디(Http Body) 영역에 값을 실어 전달할 수 있다.  
 
+</details>
+<br>
+
+
+# Fastify 기본 사용방법
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+Fastify의 주요 기능을 요약하면 아래 3가지로 요약할 수 있다.  
+- Route: URL 정보를 바탕으로 요청 처리
+- Hook: 요청에 따른 이벤트 발생 제어
+- Plugin: 다양한 기능을 만들고 조립해서 사용하게 하는 기능
+
+## Route
+RestAPI에는 URL 주소와 메소드의 조합이 기본이다.  
+이러한 URL로 전달되는 요청에 서버가 대응할 수 있게 해주는 Route는 Fastify 프레임워크의 가장 핵심적인 역할을 한다.  
+
+### 구조
+![alt text](docs/images/image-3.png)
+fastify 객체로 부터 Http 통신 메소드의 이름과 동일한 메소드를 호출한다.  
+메소드 첫번째 매개변수로 요청 url을, 두번째 매개변수로 요청에대한 처리를 하는 콜백 핸들러 함수를 전달한다.  
+핸들러 함수에는 요청에 대한 다양한 정보가 들어있는 request객체와 회신에 대한 옵션들을 받는 reply 객체를 매개변수로 받게된다.  
+
+#### Request
+- Body
+- QueryString
+- Params
+- Headers
+- 사용자 정의 값
+
+#### Reply
+요청에 내용에 따른 특정 결과를 처리하는 데필요한 요소들을 호출할 수 있다.  
+- status
+- send
+- setCookie
+
 
 </details>
 <br>
