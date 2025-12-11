@@ -479,6 +479,63 @@ fastify 객체로 부터 Http 통신 메소드의 이름과 동일한 메소드�
 - send
 - setCookie
 
+### 메소드 사용 방식
+```ts
+fastify.get(path, [options], handler)
+fastify.post(path, [options], handler)
+fastify.put(path, [options], handler)
+fastify.delete(path, [options], handler)
+```
+기본적인 사용 방식은 get과 동일하고 handler 처리 과정만 조금 다르다.  
+
+### 그외 메소드
+```ts
+fastify.head(path, [options], handler)
+fastify.options(path, [options], handler)
+fastify.patch(path, [options], handler)
+```
+위와같은 메소드도 추가로 제공해준다.  
+
+get부터 patch까지 7개의 라우터 정의 방식은 간단하게 사용하기 좋은 라우트 정의 방식으로 Shorthand Declaration 이라고 부른다.  
+
+#### 라우트 세부 정의
+```ts
+fastify.route(option)
+```
+위와같이 fastify로부터 기존 메소드를 바로 사용하지 않고 route 메소드를 호출하여 안에 필요한 기능을 명시적으로 작성한다.  
+기능의 설정은 기존과 달리 객체 형태의 옵션과 내용을 설정해서 사용하면 된다.  
+
+**option**
+```js
+{
+  method: 'GET',
+  url: '/',
+  schema: {/* ... */},
+  preHandler: function (request, reply) {
+    reply.send({hello:'world'})
+  },
+  handler: function (request, reply) {
+    reply.send({hello:'world'})
+  }
+}
+```
+method 에는 get, put, post 등의 메소드를 설정하는데, 이때 중요한 것은 메소드를 대문자로 설정해야 한다.  
+url은 말 그대로 요청 주소를 나타내고, 유효성 검사를 진행하는 schema를 배치할 수 있으며, preHandler와 handler라는 함수 형태의 훅도 정의한다.  
+이와같이 명시적으로 라우트를 정의하는것은 각 항목의 이름을 직접적으로 사용하는 것 말고는 실제 기능적 차이는 없다.  
+
+```js
+fastify.route({
+  method: 'GET',
+  url: '/',
+  schema: {/* ... */},
+  preHandler: function (request, reply) {
+    reply.send({hello:'world'})
+  },
+  handler: function (request, reply) {
+    reply.send({hello:'world'})
+  }
+})
+```
 
 </details>
 <br>
