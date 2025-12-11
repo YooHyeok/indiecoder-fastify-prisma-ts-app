@@ -537,6 +537,43 @@ fastify.route({
 })
 ```
 
+### schema
+라우터에서 URL과 handler처럼 필수적으로 배치되는 요소 외에 Schema라는 요소도 있다.  
+JSON 형태로 정의되어 있는 JSON Schema라는 방식으로 사용되며 요청과 응답 시에 주고받는 데이터의 형태를 정의하고, 정의된 데이터의 유효성을 검사하는 역할을 한다.  
+```js
+const articleSchema = {
+  schema: {
+    headers: {
+      type: 'object',
+      properties: {
+        authorization: { type: 'string' }
+      },
+      required: ['authorization'],
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          hello: { type: 'string' }
+        }
+      }
+    }
+  }
+}
+fastify.get('article', articleSchema, asnync (request, reply) => ({hello: 'world'}))
+```
+위 예제에서는 headers와 resposne에 대한 유효성 검사를 수행한다.  
+먼저 headers의 type은 object이고, 해당 object의 properties로는 authorization 이라는 필드가 있는데, 해당 필드는 string 타입이다.  
+required에 authorization이 포함되어 있으므로, 요청시 꼭 전달되어야 하는 값이라는 것을 의미한다.  
+(비슷한 방법으로 request의 또다른 요소인 Body, QueryString, Params에 대한 값도 체크할 수 있다.)  
+
+headers 다음 요소인 response를 통해 client에 전달되는 데이터 형태등의 정의를 내릴 수 있다.  
+예제에서는 200 즉, 성공적으로 응답이 처리되었을 경우 client로 보내질 데이터가 정의되어 있다.  
+이러한 JSON Schema를 통해 응답 요청시 발생하는 다양한 데이터의 데이터 타입 및 필수 사항 등에 대해 유효성 검사를 할 수 있게 되는 것이다.  
+이렇게 작성된 JSON Schema는 Router에서 URL 다음에 정의한 스키마를 배치해 (두번째 파라미터) 적용하면 된다.  
+JSON Schema의 사용은 옵션 사항으로 필수적으로 입력해야 하는 내용은 아니지만 되도록이면 사용하는 것을 권장한다.  
+JSON Schema를 이용하면 필수로 전달받아야 하거나 전달해야 하는 데이터의 형태를 정의할 수 있어 데이터 부제나 형태의 오류 등으로 발생할 수 있는 문제를 사전에 막을 수 있기 때문이다.  
+
 </details>
 <br>
 
