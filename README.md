@@ -719,6 +719,36 @@ fastify.route({
 위와같이 handler 메소드 전에 정의하여 사용하면 된다.  
 두가지 방식의 차이점으로는 addHook의 경우 작성된 라우트의 종류에 상관 없이 모든 라우트에 해당 훅을 적용하게 되지만, 라우트안에 위와같이 명시적으로 훅을 정의하여 사용하게 되면 해당 요청에만 특정 훅을 작동시킬 수 있는 차이가 있다.  
 
+## Hook의 종류
+
+### Request/Reply Hook
+Fastify에서 가장 핵심이 되는 요청/응답 Hook이다.  
+서버에 대한 요청이 일어나고 최종적으로 처리된 결과가 요청자에게 전달되는 라이프사이클 도중 발생되는 훅이다.  
+![alt text](docs/images/image-6.png)  
+[Fastify 공식 문서](https://fastify.dev/docs/latest/Reference/Hooks/)에 Hook에 대한 종류를 확인할 수 있다.  
+이름을 보면 대략 어떤 기능을 하는 지 유추할 수 있다.  
+onError의 경우 에러가 발생했을 때, preHandler의 경우 요청이 발생하기 전 사용자의 권한 등을 체크할 때 많이 사용된다.  
+
+### Application Hook
+라우터에서 발생하는 요청/응답 이 아닌 해당 서버 자체에 대한 훅이 되겠다.  
+
+예를 들어 onReady와 onClose의 경우 서버의 시작과 종료 전 어떤 처리가 필요할 수 있다.  
+```ts
+fastify.addHook('onReady', function (done) {
+  // Some Code
+  const err = null;
+  done(err);
+})
+fastify.addHook('onClose', async function () {
+  // Some async code
+  await loadCacheFromDatabase()
+})
+```
+다만 사용 방법의 경우 addHook을 이용한 방법만이 가능하다.  
+(요청 응답이 아닌 서버 자체 훅이기 때문)
+
+훅을 적절히 이용하게 되면 요청이 발생했을 때 필요한 처리를 매우 효율적으 관리할 수 있다.  
+
 </details>
 <br>
 
