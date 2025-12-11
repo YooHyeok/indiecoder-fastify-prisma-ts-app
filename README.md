@@ -574,8 +574,99 @@ headers 다음 요소인 response를 통해 client에 전달되는 데이터 형
 JSON Schema의 사용은 옵션 사항으로 필수적으로 입력해야 하는 내용은 아니지만 되도록이면 사용하는 것을 권장한다.  
 JSON Schema를 이용하면 필수로 전달받아야 하거나 전달해야 하는 데이터의 형태를 정의할 수 있어 데이터 부제나 형태의 오류 등으로 발생할 수 있는 문제를 사전에 막을 수 있기 때문이다.  
 
+### Typescript 적용
+가장 큰 차이점은 Handler 매개변수로 사용되는 request와 reply의 사용법이다.  
+```ts
+fastify.post('/articles', async (request, reply) => {
+  const { title, content } = request.body
+})
+```
+request의 경우 위 코드와 같이 body 혹은 headers, params로 부터 값을 전달받을 수 있다.  
+타입이 없는 자바스크립트에서는 위와같은 방식으로 전달되는 값을 사용할 수 있으나, 타입스크립트의 경우는 조금 다른 과정이 필요하다.  
+위 코드에서 title과 content는 body에 속한 임의의 타입이지만 body에 대한 타입 속성이 정의되어 있지 않아 값을 받아올 수가 없다.  
+그래서 이런 값들의 타입을 주입하는 과정이 필요하다.  
+
+좀더 쉽게 설명하자면, 자바스크립트에서는 구조를 몰라도 실행이 가능하지만, 타입스크립트에서는 이러한 값들의 타입이 정의도어 있어야만 프로퍼티에 안전하게 접근할 수 있다.  
+
+```ts
+type TBody {
+  title: string;
+  content: string;
+}
+fastify.post<{Body: TBody}>('/articles', async (request, reply) => {
+  const { title, content } = request.body
+})
+```
+위 코드와 같이 받아지는 값들에 대해 generic을 타입 또는 인터페이스로 정의하고 타입 기초에서 학습했던 제네릭을 이용해 해당 타입을 주입해야 한다.  
+이렇게 사용할 값들에 대해 타입을 정의해야만 핸들러에서 값을 사용할 때 오류가 발생하지 않는다.
+
+여기서 제네릭 홑화살표괄호 안에 명시적으로 정의한 타입 방식은 그 자리에서 바로 넣는 인라인 타입 방식이다.
+```ts
+type TBody {
+  title: string;
+  content: string;
+}
+type BodyType {
+  Body: TBody;
+}
+fastify.post<BodyType>('/articles', async (request, reply) => {
+  const { title, content } = request.body
+})
+```
+
+아래 코드와 같이 라우터를 명시적으로 사용할 경우도 마찬가지이다.
+```ts
+type TBody {
+  title: string;
+  content: string;
+}
+
+fastify.route<{Body: TBody}>({
+  method: 'POST',
+  url: '/',
+  handler: function (request, reply) {
+    const { title, content } = request.body
+  }
+})
+```
+
+handler에서도 직접 타입스크립트를 주입할 수 있다.  
+이 경우 fastify에 정의된 FastifyRequest, FastifyReply를 import하여 사용할 handler 내에서 request와 reply 각각에 지정해준다.  
+이때 FastifyRequest에 Generic으로 필요한 타입을 주입하면 된다.  
+```ts
+import Fasitfy, { FastifyRequest, FastifyReply } from "fastify";
+
+const fastify = Fasitfy()
+
+type TBody {
+  title: string;
+  content: string;
+}
+
+fastify.post('/', async (request: FastifyRequest<{ Body: TBody }>, reply: FastifyReply) => {
+  const { title, content } = request.body
+})
+
+fastify.route<{Body: TBody}>({
+  method: 'POST',
+  url: '/',
+  handler: function (
+    request: FastifyRequest<{ Body: TBody }>, reply: FastifyReply) {
+    const { title, content } = request.body
+  }
+})
+```
+위와같은 패턴은 핸들러의 코드를 분리할 경우 매우 유용한 패턴이기도 하다.  
+
+
+Fastify의 Route를 이용해 요청과 응답을 주고받을 수 있기 때문에 백엔드 서버를 만드는데 있어서 가장 핵심이 되는 기능이다.  
+Router를 작성하는데 있어 method schema handler 등의 기능들과 이들을 배치하는 방법.  
+그리고 Route를 정의하는 방법에서 Shorcut 방식과 명시적 방식 두가지 방식이 있다는것,
+마지막으로 타입스크립트를 이용할때 차이점에 대해 설명했다.  
+
 </details>
 <br>
+
 
 # 프로젝트 세팅
 <details>
