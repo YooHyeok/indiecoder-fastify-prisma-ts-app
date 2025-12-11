@@ -667,6 +667,60 @@ Router를 작성하는데 있어 method schema handler 등의 기능들과 이�
 </details>
 <br>
 
+# Fastify Hook
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+훅을 이해하기 위해서는 먼저 Fastify에서 다양한 이벤트에 생명주기를 이해할 필요가 있다.  
+
+Fastify에서 어떤 요청이 들어오면 아래와 같은 순서로 처리가 된다.  
+![alt text](docs/images/image-4.png)  
+
+어딘가로 부터 서버에 요청이 들어오고, 그 요청을 처리하는데 필요한 과정이 생명주기이다.  
+훅은 바로 이렇게 처리되는 과정에서 특정 순서 전에 사용자가 임의로 작성한 어떠한 이벤트를 처리해야할 때 사용하는 기능이다.   
+
+이중 대표적인 훅은 preHandler 훅이다.  
+![alt text](docs/images/image-5.png)  
+handler는 router에서 설명했듯 요청에 대한 처리를 하는 곳이다.  
+handler가 작동하기 전 먼저 수행해야 하는 과정이 있다면 preHandler에서 훅에서 그것을 처리하고 preHandler로 넘어가게 된다.  
+이와같이 이벤트 처리 순서 전 사용자가 따로 개입하는 것을 훅이라고 한다.  
+훅을 사용하는 가장 기본적인 방법은 route를 사용했던 것과 비슷하다.  
+```ts
+fastify.addHook('onRequest', (request, reply, done) => {
+  // Some Code
+  done();
+})
+```
+fastify 객체로 부터 addHook 메소드를 호출하고, 첫번째 매개변수로 사용할 훅의 종류를, 두번째 매개변수로 콜백 함수형태로 필요한 로직을 처리한다.  
+콜백 함수의 매개변수로는 request, reply, done을 가지게 된다.  
+위 예제와 같이 addHook을 이용하여 작성할 경우 Route에서 Request가 발생하기 전 해당훅을 이용한 처리를 먼저 하게 된다.  
+
+또 다른 사용 방법으로 라우트에서 필요한 설정 방법이 있다.  
+```ts
+fastify.route({
+  method: 'GET',
+  url: '/',
+  schema: {/* ... */},
+  preHandler: function (request, reply, done) {
+    reply.send({hello:'world'})
+  },
+  onRequest: function (request, reply, done) {
+  },
+  preValidation: function (request, reply, done) {
+  },
+  onError: function (request, reply, done) {
+  },
+  handler: function (request, reply, done) {
+    reply.send({hello:'world'})
+  }
+})
+```
+위와같이 handler 메소드 전에 정의하여 사용하면 된다.  
+두가지 방식의 차이점으로는 addHook의 경우 작성된 라우트의 종류에 상관 없이 모든 라우트에 해당 훅을 적용하게 되지만, 라우트안에 위와같이 명시적으로 훅을 정의하여 사용하게 되면 해당 요청에만 특정 훅을 작동시킬 수 있는 차이가 있다.  
+
+</details>
+<br>
 
 # 프로젝트 세팅
 <details>
