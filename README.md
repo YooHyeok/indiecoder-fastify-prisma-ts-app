@@ -802,8 +802,44 @@ fastify.register(route)
 예를들어 메인 url 다음으로 /auth url을 호출하면 authRoute 내용을 호출할 수 있고, /articles url을 호출하면 articleRoute를 호출할 수 있다.  
 이렇게 만든 메인 route는 최종적으로 fastify의 register에 등록한다.  
 
+## 사용자 정의 Plugin 
+플러그인은 Route를 분할하는 역할 말고도 Fastify의 개발자가 원하는 기능을 추가로 만들어 사용하는 역할도 한다.  
+이를 위해서는 우선, fastify-plugin 패키지를 설치하여 사용하는 것을 권장하고 있다.  
+
+```bash
+npm i fastify-plugin
+```
+
+```ts
+import fp from 'fastify-plugin'
+
+function customPlugin() {
+  fastify.decorate('name', null)
+  /* ... */
+}
+
+export const customPluginName = fp(customPlugin, {
+  name: 'customPluginName'
+})
+/* ... */
+
+fastify.register(customPluginName)
+```
+설치한 fastify-plugin으로 부터 fp 패키지를 import한다.  
+plugin은 일반적힌 함수 형태로 정의하여 사용하며, 일반적으로 많이 사용하게 되는 기능은 fastify의 decorate 이다.  
+decorate의 역할은 해당 플러그인을 사용하게 될 때 필요한 객체들을 등록하는 역할을 한다.  
+
+다음으로 작성된 plugin을 fastify-plugin에 등록하기 위해서는 import한 fp를 호출하여 첫번째 매개변수로 전달한다.  
+이때 플러그인 이름을 따로 등록하는 것도 가능하다.  
+
+마지막으로 fastify-plugin에 등록한 플러그인 객체를 fastify의 register에 등록해준다.  
+
+### 정리
+plugin은 fastify의 핵심기능에 route를 주제별로 분류해서 작성하게 도와주고 또 패스티파이에 기본적으로 탑재되지 않는 기능들을 쉽게 확장할 수 있도록 도와주는 역할을 하게 된다.  
+
 </details>
 <br>
+
 
 # 프로젝트 세팅
 <details>
