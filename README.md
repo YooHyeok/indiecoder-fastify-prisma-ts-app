@@ -752,6 +752,59 @@ fastify.addHook('onClose', async function () {
 </details>
 <br>
 
+
+# Fastify Plugin
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+Fastify의 기능 확장에 사용된다.  
+기본적으로 거대해진 라우트를 주제별로 나누어 배치할 때 사용된다.  
+또 Fastify에서 제공하지 않는 특정 기능을 Plugin으로 만들어 사용할 수도 있다.  
+
+```ts
+import {FastifyInstance, FastifyRequest, FastifyReply} from 'fastify'
+
+const articleRoute = async (fastify: FastifyInstance) => {
+  fastify.post('register', /* ,,, */)
+  fastify.get('users', /* ,,, */)
+}
+export default articleRoute
+```
+위와 같이 특정 주제의 route 함수를 만들고 이를 export 시키면 된다.  
+이때 매개변수로 fastify를 사용하는데, 타입스크립트의 경우 fastify 패키지로부터 FastifyInstance 타입을 가져와 배치하면 된다.  
+
+이와같이 주제별로 만들어진 라우터들은 레지스터를 이용하여 모아지고 등록하여 사용할 수 있다.  
+```ts
+import Fasitfy from "fastify";
+import pluginName from 'pluginName'
+
+const fastify = Fasitfy()
+fastify.register(pluginName, [options])
+```
+위와같이 만들어진 플러그인을 import로 불러온 후 fastify의 register를 호출하여 plugin을 등록하고 option을 설정하면 된다.  
+
+register를 이용하여 작성된 라우터를 등록하는 방법은 다음과 같다.  
+```ts
+import Fasitfy {FastifyInstance} from "fastify";
+import authRoute from './auth'
+import articleRoute from './article'
+
+const fastify = Fasitfy()
+const route = async (fastify: FastifyInstance) => {
+  await fastify.register(authRoute, {prefix: '/auth'})
+  await fastify.register(articleRoute, {prefix: '/articles'})
+}
+fastify.register(route)
+```
+작성된 router들을 import하고, route 함수를 작성한 다음, 해당 함수 안에 fastify의 register를 이용하여 불러온 라우터를 배치하면 된다.  
+이때 중요한 옵션으로 prefix라는 것이 있는데, prefix를 통해 호출할 하위 url을 등록할 수 있다.  
+예를들어 메인 url 다음으로 /auth url을 호출하면 authRoute 내용을 호출할 수 있고, /articles url을 호출하면 articleRoute를 호출할 수 있다.  
+이렇게 만든 메인 route는 최종적으로 fastify의 register에 등록한다.  
+
+</details>
+<br>
+
 # 프로젝트 세팅
 <details>
 <summary>접기/펼치기</summary>
