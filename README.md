@@ -840,6 +840,48 @@ plugin은 fastify의 핵심기능에 route를 주제별로 분류해서 작성�
 </details>
 <br>
 
+# Prisma
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+DataBase를 조회하는 SQL문을 조금 더 편리하게 개발할 수 있도록 도와주는 ORM의 하나이다.  
+Prisma는 기본적으로 NodeJS가 설치된 환경에서 패키지를 설치하여 사용할 수 있다.  
+강의에서 사용하는 Prisma의 버전은 5.6 버전이다.  
+```bash
+npm i -D prisma@5.6.0
+```
+
+## SQLITE
+아주 가벼운 RDB로, 가벼운 프로젝트나 실습 용도로 사용할 수 있는 RDB이다.
+일반적인 RDB와 다르게 환경설치 없이 이미지파일 하나만으로 RDB의 일반적인 기능들을 사용할 수 있다.  
+
+npx를 활용하여 Prisma가 SQLITE를 사용할 수 있는 환경을 설정한다.  
+```
+npx prisma init --datasource-provider sqlite
+```
+
+설치가 완료되면 아래 사진과 같이 `.env`파일과 `schema.prisma`라는 파일이 구성된 prisma라는 폴더가 생성이 된다.  
+![alt text](image-7.png)
+
+schema.prisma 파일에 실제 DB 구조를 정의하는 Schema 등을 작성하여 Database의 테이블 등을 생성하거나 수정할 수 있다.  
+```.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+generator db {
+  provider = "sqilite"
+  url = env("DATABASE_URL")
+}
+```
+위 코드는 schema.prisam 파일에 DataBase와 기본 연결 정보가 설정된 내용이다.  
+코드상의 url 속성은 DB 경로가 된다.  
+env 함수를 통해 DB 경로를 불러오는데, 이때 해당 정보는 prisma 폴더 하위에 .env 파일 설정되어 해당 정보를 불러오는 것이다.  
+
+SQLITE는 파일로 DB가 생성되며 prisma 폴더에 생성된다.
+
+</details>
+<br>
 
 # 프로젝트 세팅
 <details>
