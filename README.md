@@ -880,6 +880,34 @@ env 함수를 통해 DB 경로를 불러오는데, 이때 해당 정보는 prism
 
 SQLITE는 파일로 DB가 생성되며 prisma 폴더에 생성된다.
 
+### DB Schema 정의
+Prisma가 다른 ORM과 차별화 된 특징 중 하나는 Prisma를 이용해서 DB 구조 즉, 테이블 등을 직접 관리할 수 있다.  
+Prisma를 이용하면 DB 관리 툴을 사용하지 않고도 Prisma 만을 가지고 DB 테이블 구조를 생성/수정/삭제 할 수 있다
+DB 테이블 구조는 Schema라고 불리는 것을 작성하여 이를 바탕으로 구성된다.  
+
+#### 기본 작성 방법
+```.prisma
+model 테이블 이름 {
+  컬럼이름 타입
+}
+```
+위와 같이 model 키워드를 사용하여 테이블 이름 작성 후 중괄호 블록 내 컬럼 이름과 타입 형식으로 내용을 작성하면 된다.  
+- prisma/schema.prisma
+  ```.prisma
+  model Post{
+    id        Int
+    title     String
+    content   String
+    published Boolean
+    authorId  Int
+  }
+  model User{
+    id        Int
+    email     String
+    name      String
+  }
+  ```
+
 </details>
 <br>
 
