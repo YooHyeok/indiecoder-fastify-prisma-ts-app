@@ -907,6 +907,120 @@ model 테이블 이름 {
     name      String
   }
   ```
+#### 추가 제약사항 설정
+- prisma/schema.prisma
+  ```.prisma
+  model Post{
+    id        Int     @id @default(autoincrement())
+    title     String
+    content   String?
+    published Boolean @default(false)
+    authorId  Int
+  }
+  model User{
+    id        Int     @id @default(autoincrement())
+    email     String  @unique
+    name      String?
+  }
+  ```
+  식별 값일 경우 @id 키워드를 작성하고, 단순 고유값일 경우 @unique, 그리고 @default(autoincrement())로 자동 증가값 설정을 한다.  
+  @default(autoincrement())를 설정함으로써 값이 증가되는 형태로 중복없이 데이터 로우가 추가되게 된다.  
+  @unique는 중복되지 않는 고유 값들만 넣는 옵션이다.  
+  Post의 content 혹은 User의 name 타입 우측에 ?가 붙어있는데, null을 허용하는 옵션이다.  
+
+#### 테이블간 관게 설정
+- prisma/schema.prisma
+  ```.prisma
+  model Post{
+    id        Int     @id @default(autoincrement())
+    title     String
+    content   String?
+    published Boolean @default(false)
+    author    User?   @relation(fields: [authorId], references: [id])
+    authorId  Int
+  }
+  model User{
+    id        Int     @id @default(autoincrement())
+    email     String  @unique
+    name      String?
+    Posts Post[]
+  }
+  ```
+  Post에서 User를 참조해야 하는 경우 Post에 특정 컬럼(author)를 추가하고 컬럼 옆 타입에 User을 지정한다.  
+  타입 지정시 User가 없을수도 있기 때문에 ? 키워드를 붙힌다.  
+  바로 이어서 @relation옵션을 통해 User의 id를 참조하는 authorId 컬럼을 fk로 지정해준다.
+  fields 속성은 실제로 사용될 fk 컬럼이름, references 속성은 대상 테이블에서 참조할 컬럼으로 설정한다.  
+
+  해당 관계는 ORM 관점에서 1개의 User는 여러개의 Post를 가질 수 있도록 양방향 관계이다.  
+  ORM에서는 관계의 주인이 FK를 갖게된다.  
+
+  DB 관점의 1:N 관계는 한명의 User는 여러개의 Post를 작성할수 있다.  
+  이때 Post가 어느 User의 소속인지에 대한 정보(FK)를 가져야만 1:N 관계가 성립된다.
+  User는 어떤 Post를 가지고 있는지에 대한 정보를 가지지 않는다.
+  해당 정보는 User를 조회할 때 join을 통해 User의 userid와 Post의 fk와 일치하는 조건의 Post를 함께 가져온다.  
+  이렇게 되면 같은 user지만 다른 post를 갖는 동일한 user의 정보가 중복으로 조회된다.  
+
+  ORM 관점에서는 관계의 주인이 FK를 갖게 되는데, 관계의 주인은 Post가 된다.  
+  그 이유는 DB 관점에서 봤을 때 Post가 실제로 User와의 연관관계를 정의하고 관리하는 책임을 가지기 때문이다.   
+  어떤 User(FK)에 속하는지 결정하고 변경할 수 있는 위치에 있는 쪽이 Post이므로, 관계의 주인은 FK를 가진 Post가 된다.  
+  이때 하나의 User는 여러개의 Post를 갖게 되므로, N인 Post가 FK를 갖게 되었다.  
+  이렇게 1:N 관계에서는 소속을 결정하고 변경할 수 있는 테이블이 N이 되며,   
+  같은 이유(소속을 결정할 수 있는 테이블이 N이 된다)에 의해 일반적으로 N이 FK를 갖게 된다.  
+
+  ORM 관점에서 1:N으로 표현하지 않고 관계의 주인이라는 측면에서 N을 주인으로 보고 Many To One(N:1) 관계로 표현한다.  
+
+  위 코드는 Many To One 양방향 관계이다.  
+  User가 여러개의 Post를 갖는 Posts라는 컬럼을 갖게 되는데, 실제 DB 관점에서는 해당 값을 갖지 않지만, 
+  Post를 통해 원하는 User에 대한 동일한 Post를 조회하는것 보다, User 기준으로 Post 값을 조회하는것이 보다 효율적이다.
+  그러나, 단방향으로 설정할 경우 User에는 Post에 대한 정보를 얻을 수 없기 때문에 객체간 패러다임 불일치가 발생한다.  
+
+  따라서 양방향을 설정하는 이유는, User 객체를 기준으로 직접 Post 목록을 탐색하 수 있도록 하여 객체 지향적으로 모델링하고,  
+  조회 시에도 Post를 역방향으로 찾기 위한 불피요한 쿼리 조합이나 조건 계산 없이 User.Posts를 통해 즉시 접근할 수 있는 구조를 만들기 위함이다.  
+  User 중심의 도메인에서 특정 User의 모든 Post를 관리/조작 하는 기능이 필요한 경우 User에 접근하여 객체 그래프 자체에서 탐색이 가능해져 코드가 더 자연스럽고 단순해진다는 장점이 있다.  
+
+#### 관계 Cacade 옵션
+Post의 경우 USer와 관계를 맺고 있으므로 User가 삭제되면 해당 User를 참조하는 Post가 있어 삭제시 오류가 발생하고 삭제되지 않는다.  
+  이때 onDelete: Cacade 옵션을 지정하면 자동으로 연관된 테이블들을 삭제하게 되어 User 삭제가 가능해진다.  
+- prisma/schema.prisma
+  ```.prisma
+  model Post{
+    id        Int     @id @default(autoincrement())
+    title     String
+    content   String?
+    published Boolean @default(false)
+    author    User?   @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    authorId  Int
+  }
+  model User{
+    id        Int     @id @default(autoincrement())
+    email     String  @unique
+    name      String?
+    Posts Post[]
+  }
+  ```
+   
+
+#### 세부 타입 정의
+DB마다 타입이 조금씩 차이가 있다.  
+Prisma에서는 이를 단순화 하여 Int, String 과 같이 정의하지만 실제 DB는 이를 바탕으로 내부적인 타입이 정의된다.  
+- prisma/schema.prisma
+  ```.prisma
+  model Post{
+    id        Int     @id @default(autoincrement())
+    title     String  @db.VarChar(255)
+    content   String?
+    published Boolean @default(false)
+    author    User?   @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    authorId  Int
+  }
+  model User{
+    id        Int     @id @default(autoincrement())
+    email     String  @unique
+    name      String?
+    Posts Post[]
+  }
+  ```
+  위 코드의 title의 String타입에는 `@db.VarChar(255)`를 지정하여 최대 255글자를 허용하는 가변타입으로 세부적인 설정을이 되었다.
 
 </details>
 <br>
