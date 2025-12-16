@@ -1036,6 +1036,11 @@ dev.db가 바로 SQLITE DB에 해당한다.
 migrattion 디렉토리 하위에 init이라는 suffix가 붙은 디렉토리가 구성된다.  
 해당 디렉토리 하위에 생성된 migration.sql 파일을 열어보면 생성된 테이블의 생성 SQL문이 작성되어 있다.  
 
+#### SQLite Viewr 가이드
+dev.db 파일 내용을 보기 위해서는 DB Browser for SQLITE라는 프로그램을 다운받거나 VSC의 SQLite Viewr 플러그인을 설치하여 확인할 수 있다.  
+![alt text](image-9.png)
+![alt text](image-10.png)
+
 </details>
 <br>
 
