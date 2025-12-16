@@ -1022,6 +1022,20 @@ Prisma에서는 이를 단순화 하여 Int, String 과 같이 정의하지만 �
   ```
   위 코드의 title의 String타입에는 `@db.VarChar(255)`를 지정하여 최대 255글자를 허용하는 가변타입으로 세부적인 설정을이 되었다.
 
+### DataBase 마이그레이션
+설정된 스키마를 바탕으로 실제 DB 테이블을 만든다.  
+```bash
+npx prisma migrate dev --name init
+```
+--name 옵션을 통해 마이그레이션 기록을 남길 폴더 이름을 지정할 수 있다.  
+명령을 실행하면 dev.db 파일과 migragtions 디렉토리가 생성된다.  
+![alt text](image-8.png)
+
+dev.db가 바로 SQLITE DB에 해당한다.  
+
+migrattion 디렉토리 하위에 init이라는 suffix가 붙은 디렉토리가 구성된다.  
+해당 디렉토리 하위에 생성된 migration.sql 파일을 열어보면 생성된 테이블의 생성 SQL문이 작성되어 있다.  
+
 </details>
 <br>
 
