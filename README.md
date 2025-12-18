@@ -1041,8 +1041,16 @@ dev.db 파일 내용을 보기 위해서는 DB Browser for SQLITE라는 프로�
 ![alt text](image-9.png)
 ![alt text](image-10.png)
 
+#### DB Schema 수정
+schema 파일을 수정한 후 수정된 내용으로 반영하기 위해 아래 명령을 실행시키면 된다.  
+```bash
+npx prisma migrate dev --name added_job_title
+```
+마찬가지로 --name 옵션을 통해 특이점등을 폴더에 기록할 수 있다.  
+
 </details>
 <br>
+
 
 # 프로젝트 세팅
 <details>
