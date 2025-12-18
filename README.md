@@ -1051,6 +1051,25 @@ npx prisma migrate dev --name added_job_title
 </details>
 <br>
 
+# Prisma Cilent
+<details>
+<summary>접기/펼치기</summary>
+<br>
+
+Prisma를 통해 DataBase를 제어해본다.  
+크게 아래와 같은 CRUD 제어가 가능하다
+- Create(쓰기)
+- Read(읽기)
+- Update(수정)
+- Delete(삭제)
+
+DB를 제어하기 위해 Prisam Client 패키지를 설치해야 한다.
+```bash
+npm i @prisma/client
+```
+
+</details>
+<br>
 
 # 프로젝트 세팅
 <details>
