@@ -1068,6 +1068,41 @@ DB를 제어하기 위해 Prisam Client 패키지를 설치해야 한다.
 npm i @prisma/client
 ```
 
+## 실제 적용 코드
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+```
+설치된 prisma/client로 부터 PrismaClient를 import로 불러오고
+new 키워드를 통해 객체를 생성하여 변수에 할당한다.  
+
+### create
+```ts
+prisma.테이블명.create({
+  data: {
+    컬럼1: '데이터',
+    컬럼2: '데이터',
+    /* ... */
+  }
+})
+```
+위와같은 형태로 작성한다.
+
+실제 User 테이블에 사용자 정보를 입력해본다.  
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+prisma.user.create({
+  data: {
+    email: 'elsa@prisma.io',
+    name: 'Elsa Prisma'
+  }
+})
+```
+data 속성 안에 추가할 email과 name에 대한 정보를 작성한다.  
+
 </details>
 <br>
 
