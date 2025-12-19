@@ -1103,6 +1103,25 @@ prisma.user.create({
 ```
 data 속성 안에 추가할 email과 name에 대한 정보를 작성한다.  
 
+#### 벌크 삽입: createMany
+만약 여러개의 데이터를 한번에 입력한다면 create 메소드 대신 createMany 메소드를 사용하고, data 속성을 배열 형태로 정의한 후 해당 배열에 객체 타입을 삽입할 로우단위로 정의하면 된다.  
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+prisma.user.createMany({
+  data: [
+    { name: 'Bob', email: 'bob@prisma.io' },
+    { name: 'Bobb', email: 'bob@prisma.io' }, // Duplicate Unique key!
+    { name: 'Yewande', email: 'yewande@prisma.io' },
+    { name: 'Angelique', email: 'angelique@prisma.io' },
+  ],
+  skipDuplicates: true, // Skip 'Babo'
+})
+```
+skipDuplcates 옵션을 true로 설정할 경우 @Unique로 설정되어있는 컬럼(email)의 중복을 감하여 중복된 내용을 skip하고 데이터를 입력할 수 있다.  
+위 코드에서는 email이 `bob@prisma.io` 값이 중복되므로 해당 row의 삽입이 skip 된다.  
+
 </details>
 <br>
 
