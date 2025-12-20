@@ -1122,6 +1122,49 @@ prisma.user.createMany({
 skipDuplcates 옵션을 true로 설정할 경우 @Unique로 설정되어있는 컬럼(email)의 중복을 감하여 중복된 내용을 skip하고 데이터를 입력할 수 있다.  
 위 코드에서는 email이 `bob@prisma.io` 값이 중복되므로 해당 row의 삽입이 skip 된다.  
 
+#### 관계형 데이터 삽입
+
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+prisma.user.create({
+  data: {
+    email: 'elsa@prisma.io',
+    name: 'Elsa Prisma',
+    posts: {
+      create: {
+        title: 'Include this post!',
+      }
+    }
+  }
+})
+```
+기본적으로 data에 user에 대한 정보를 작성하고,  
+schema에서 작성해 둔 posts속성을 객체 형태로 선언한 뒤 객  
+`create` 옵션을 객체 형태의 속성으로 주고, 하위에 title 속성과 값을 기입한다.  
+
+(posts 실제 Prisma의 schema상에 user의 테이블의 1:N에 복수형 관계로 선언된 컬럼이다.)
+
+아래와 같이 data 부분을 변수로 추출하는 방식으로도 작성 가능하다.  
+```ts
+import { PrismaClient } from '@prisma/client'
+
+const user = {
+  email: 'elsa@prisma.io',
+  name: 'Elsa Prisma',
+  posts: {
+    create: {
+      title: 'Include this post!',
+    }
+  }
+}
+
+const prisma = new PrismaClient()
+const createUser = await prisma.user.create({ data: user })
+```
+
+
 </details>
 <br>
 
