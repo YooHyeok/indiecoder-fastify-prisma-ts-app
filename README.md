@@ -1165,6 +1165,338 @@ const createUser = await prisma.user.create({ data: user })
 ```
 
 
+### read
+data를 조회하는 방법은 여러가지가 있다.
+#### 단일 데이터 조회
+중복되지 않는 데이터를 받아오거나 첫번째 데이터를 받아오는 기능을 한다.
+- findUnique : 중복되지 않는 단일 값
+- findFirst : 중복 되더라도 제일 우선되는 첫번째 단일 값
+
+##### 사용방법
+```ts
+prisma.테이블명.findUnique()
+prisma.테이블명.findFirst()
+```
+
+#### 복수 데이터 조회
+- findMany
+```ts
+prisma.테이블명.findMany()
+```
+```ts
+const users = await prisma.user.findMany()
+```
+조건에 맞는 모든 데이터를 DB로 부터 가져온다.
+
+#### Where 옵션
+데이터를 조회할때는 옵션을 통해 필터링된 데이터를 가져오는것이 대부분이다.  
+prisma에서도 일반적인 RDB와 같이 필터링을 위한 where 옵션을 제공해준다.  
+```ts
+prisma.테이블명.findUnique({
+  where: {
+    필터링_할_컬럼: 값
+  }
+})
+```
+- 필터링 조회 예제 - email 기준
+  - sql
+    ```sql
+    SELECT * FROM user WHERE email = 'elsa@prisma.io'
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findUnique({
+      where: {
+        email: 'elsa@prisma.io'
+      }
+    })
+    ```
+- 필터링 조회 예제 - id 기준
+  - sql
+    ```sql
+    SELECT * FROM user WHERE id = 99
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findUnique({
+      where: {
+        id: 99
+      }
+    })
+    ```
+##### endsWith
+문자열 후방일치 조건에 해당한다.  
+즉, 특정 문자열로 끝나는 조건일 떄 사용한다.  
+(문자열 뒷부분만 비교)
+예를들어 가입된 이메일 정보 중 특정 이메일 도메인으로 가입된 계정만 찾을 경우에 사용 할 수 있다.  
+(이메일의 구성은 아이디@도메인 으로 구성되어있기 때문)
+
+- sql
+  ```sql
+  SELECT * FROM user WHERE email LIKE '%prisma.io'
+  ```
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      email: {
+        endsWith: "prisma.io"
+      }
+    }
+  })
+  ```
+##### OR | AND
+OR 혹은 AND 옵션을 활용하여 더욱 복잡한 조건의 필터링도 가능하다.  
+- sql
+  ```sql
+  SELECT * FROM User WHERE name LIKE 'E%' OR (profileViews > 0 AND role = 'ADMIN');
+  ```
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          name: {
+            startsWith: "E"
+          }
+        },
+        {
+          AND: {
+            profileViews: {
+              gt: 0
+            },
+            role: {
+              equals: 'ADMIN'
+            }
+          }
+        }
+      ]
+    }
+  })
+  ```
+  OR 조건은 배열로 구성하여 배열 안의 객체 요소들을 OR로 결합한다.  
+  반면 AND 조건은 객체로 구성하여 객체 안의 모든 요소들을 AND로 결합한다.
+  위 조건은 name 값이 E로 시작하거나, profileViews값이 0이면서 role이 ADMIN인 데이터를 조회하는 필터링 조건이다.  
+
+##### 관계형 필터링
+OR 혹은 AND 옵션을 활용하여 더욱 복잡한 조건의 필터링도 가능하다.  
+
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      email: {
+        endsWith: "prisma.io"
+      },
+      posts: {
+        some: {
+          published: false
+        }
+      }
+    }
+  })
+  ```
+- sql
+  prisma는 findMany에서 중복된 레코드를 반환하지 않으므로 Distinct 처리한다.
+  ```sql
+  SELECT DISTINCT u.*
+  FROM User u
+  JOIN Post p ON p.userId = u.id
+  WHERE
+      u.email LIKE '%prisma.io'
+      AND p.published = FALSE;
+  ```  
+#### oder by 옵션
+반환된 레코드의 정렬을 도와주는 기능이다.  
+정렬 조건을 지정할 수 있다.  
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      /* ... */
+    },
+    orderBy: {
+      id: "desc"
+    }
+  })
+  ```
+  id 기준 desc(내림차순) 정렬 코드이다.  
+  desc를 asc로 변경하면 오름차순으로 정렬된 값을 받게 된다.  
+  (orderBy 생략시 기본은 asc 이므로 단일 정렬 조건이라면 생략하면 된다.)
+
+#### select
+테이블의 모든 컬럼이 아닌 필요한 몇몇 컬럼만 가져올때 사용하는 옵션이다.
+  - sql
+    ```sql
+    SELECT email, name FROM user WHERE email = 'elsa@prisma.io'
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findUnique({
+      where: {
+        email: 'elsa@prisma.io'
+      },
+      select: {
+        email: true,
+        name: true,
+      }
+    })
+    ```
+##### 관계형 select 옵션
+  - sql
+    ```sql
+    SELECT 
+        u.name AS user_name,
+        p.title AS post_title
+    FROM User u
+    LEFT JOIN Post p
+        ON p.userId = u.id;
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findMany({
+      select: {
+        name: true,
+        posts: {
+          select: {
+            title: true
+          }
+        }
+      }
+    })
+    ```
+##### 관계형 include 옵션
+```ts
+const users = await prisma.user.findMany({
+  where: {
+    role: 'ADMIN'
+  },
+  include: {
+    posts: true
+  }
+})
+```
+```sql
+SELECT 
+    u.*,
+    p.*
+FROM User u
+LEFT JOIN Post p
+    ON p.userId = u.id
+WHERE u.role = 'ADMIN';
+```
+
+
+### update
+데이터 수정에 해당하는 기능이다.  
+```ts
+prisma.테이블명.update({})
+```
+
+```ts
+const updateUser = await prisma.user.update({
+  where: {
+    id: 99
+  },
+  data: {
+    name: 'Viola the Magnificent'
+  }
+})
+```
+where 속성에 조건을 부여하고, data 속성에 실제 변경할 컬럼과 변경할 값을 기입한다.  
+주의할 점은 update 기능은 단일 로우에 대해서만 수정할 수 있다.  
+만약 where에 정의한 조건 속성이 중복이 가능한 컬럼이라면 오류가 발생하게 된다.  
+따라서 pk나 unique 제약조건이 설정된 컬럼만 조건 속성으로 부여 해야만 정상적으로 수정된다.  
+
+```sql
+UPDATE user SET name='Viola the Magnificent' WHERE email='viola@prisma.io'
+```
+
+#### 벌크 수정: updateMany
+```ts
+const updateUsers = await prisma.user.updateMany({
+  where: {
+    email: {
+      contains: 'prisma.io'
+    }
+  },
+  data: {
+    role: 'ADMIN'
+  }
+})
+```
+
+```sql
+UPDATE user SET role='ADMIN' WHERE email LIKE '%prisma.io';
+```
+
+#### 숫자필드 update 옵션
+- increment: 현재 값에 n을 더함
+- decrement: 현재 값에서 n을 뺌
+- multiply: 현재 값에 n을 곱함.
+- divide: 현재 값을 n으로 나눔.
+- set: 현재 필드 값을 바로 설정. ({ myField: n }과 동일)
+
+##### increment/decrement
+update에서 자주 사용하는 옵션으로 증가와 감소하는 기능을 제공한다.  
+증가시 increment 속성을, 감소시 decrement 속성을 수정할 컬럼에 기입한다.
+
+```ts
+const updatePosts = await prisma.post.updateMany({
+  data: {
+    views: {
+      increment: 1,
+    },
+    likes: {
+      decrement: 1,
+    }
+  }
+})
+```
+```sql
+UPDATE post SET views=views+1, likes=likes-1
+```
+
+### delete
+값을 삭제하는 기능
+
+#### 기본 문법
+```ts
+prisma.테이블명.delete()
+```
+#### 예제
+- prisma
+  ```ts
+  const deleteUser = await prisma.user.delete({
+    where: {
+      email: 'bert@prisma.io'
+    }
+  })
+  ```
+  where 옵션을 통해삭제 조건을 지정할수도 있다.  
+- sql
+  ```sql
+  DELETE FROM user WHERE email='bert@prisma.io'
+  ```
+
+
+#### 벌크 삭제: deleteMany
+contains와 같은 필터링을 통한 다중 row 삭제만 가능하다.  
+- prisma
+  ```ts
+  const deleteUser = await prisma.user.deleteMany({
+    where: {
+      email: {
+        contains: 'prisma.io'
+      }
+    }
+  })
+  ```
+- sql
+  ```sql
+  DELETE FROM user WHERE email LIKE '%prisma.io'
+  ```
 </details>
 <br>
 
