@@ -1165,6 +1165,29 @@ const createUser = await prisma.user.create({ data: user })
 ```
 
 
+### read
+data를 조회하는 방법은 여러가지가 있다.
+#### 단일 데이터 조회
+중복되지 않는 데이터를 받아오거나 첫번째 데이터를 받아오는 기능을 한다.
+- findUnique : 중복되지 않는 단일 값
+- findFirst : 중복 되더라도 제일 우선되는 첫번째 단일 값
+
+##### 사용방법
+```ts
+prisma.테이블명.findUnique()
+prisma.테이블명.findFirst()
+```
+
+#### 복수 데이터 조회
+- findMany
+```ts
+prisma.테이블명.findMany()
+```
+```ts
+const users = await prisma.user.findMany()
+```
+조건에 맞는 모든 데이터를 DB로 부터 가져온다.
+
 </details>
 <br>
 
