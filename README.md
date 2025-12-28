@@ -1188,6 +1188,97 @@ const users = await prisma.user.findMany()
 ```
 조건에 맞는 모든 데이터를 DB로 부터 가져온다.
 
+#### Where 옵션
+데이터를 조회할때는 옵션을 통해 필터링된 데이터를 가져오는것이 대부분이다.  
+prisma에서도 일반적인 RDB와 같이 필터링을 위한 where 옵션을 제공해준다.  
+```ts
+prisma.테이블명.findUnique({
+  where: {
+    필터링_할_컬럼: 값
+  }
+})
+```
+- 필터링 조회 예제 - email 기준
+  - sql
+    ```sql
+    SELECT * FROM user WHERE email = 'elsa@prisma.io'
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findUnique({
+      where: {
+        email: 'elsa@prisma.io'
+      }
+    })
+    ```
+- 필터링 조회 예제 - id 기준
+  - sql
+    ```sql
+    SELECT * FROM user WHERE id = 99
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findUnique({
+      where: {
+        id: 99
+      }
+    })
+    ```
+##### endsWith
+문자열 후방일치 조건에 해당한다.  
+즉, 특정 문자열로 끝나는 조건일 떄 사용한다.  
+(문자열 뒷부분만 비교)
+예를들어 가입된 이메일 정보 중 특정 이메일 도메인으로 가입된 계정만 찾을 경우에 사용 할 수 있다.  
+(이메일의 구성은 아이디@도메인 으로 구성되어있기 때문)
+
+- sql
+  ```sql
+  SELECT * FROM user WHERE email LIKE '%prisma.io'
+  ```
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      email: {
+        endsWith: "prisma.io"
+      }
+    }
+  })
+  ```
+##### OR | AND
+OR 혹은 AND 옵션을 활용하여 더욱 복잡한 조건의 필터링도 가능하다.  
+- sql
+  ```sql
+  SELECT * FROM User WHERE name LIKE 'E%' OR (profileViews > 0 AND role = 'ADMIN');
+  ```
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          name: {
+            startsWith: "E"
+          }
+        },
+        {
+          AND: {
+            profileViews: {
+              gt: 0
+            },
+            role: {
+              equals: 'ADMIN'
+            }
+          }
+        }
+      ]
+    }
+  })
+  ```
+  OR 조건은 배열로 구성하여 배열 안의 객체 요소들을 OR로 결합한다.  
+  반면 AND 조건은 객체로 구성하여 객체 안의 모든 요소들을 AND로 결합한다.
+  위 조건은 name 값이 E로 시작하거나, profileViews값이 0이면서 role이 ADMIN인 데이터를 조회하는 필터링 조건이다.  
+
 </details>
 <br>
 
