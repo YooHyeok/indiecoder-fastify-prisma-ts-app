@@ -1279,6 +1279,114 @@ OR 혹은 AND 옵션을 활용하여 더욱 복잡한 조건의 필터링도 가
   반면 AND 조건은 객체로 구성하여 객체 안의 모든 요소들을 AND로 결합한다.
   위 조건은 name 값이 E로 시작하거나, profileViews값이 0이면서 role이 ADMIN인 데이터를 조회하는 필터링 조건이다.  
 
+##### 관계형 필터링
+OR 혹은 AND 옵션을 활용하여 더욱 복잡한 조건의 필터링도 가능하다.  
+
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      email: {
+        endsWith: "prisma.io"
+      },
+      posts: {
+        some: {
+          published: false
+        }
+      }
+    }
+  })
+  ```
+- sql
+  prisma는 findMany에서 중복된 레코드를 반환하지 않으므로 Distinct 처리한다.
+  ```sql
+  SELECT DISTINCT u.*
+  FROM User u
+  JOIN Post p ON p.userId = u.id
+  WHERE
+      u.email LIKE '%prisma.io'
+      AND p.published = FALSE;
+  ```  
+#### order by 옵션
+반환된 레코드의 정렬을 도와주는 기능이다.  
+정렬 조건을 지정할 수 있다.  
+- prisma
+  ```ts
+  const user = await prisma.user.findMany({
+    where: {
+      /* ... */
+    },
+    orderBy: {
+      id: "desc"
+    }
+  })
+  ```
+  id 기준 desc(내림차순) 정렬 코드이다.  
+  desc를 asc로 변경하면 오름차순으로 정렬된 값을 받게 된다.  
+  (orderBy 생략시 기본은 asc 이므로 단일 정렬 조건이라면 생략하면 된다.)
+
+#### select
+테이블의 모든 컬럼이 아닌 필요한 몇몇 컬럼만 가져올때 사용하는 옵션이다.
+  - sql
+    ```sql
+    SELECT email, name FROM user WHERE email = 'elsa@prisma.io'
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findUnique({
+      where: {
+        email: 'elsa@prisma.io'
+      },
+      select: {
+        email: true,
+        name: true,
+      }
+    })
+    ```
+##### 관계형 select 옵션
+  - sql
+    ```sql
+    SELECT 
+        u.name AS user_name,
+        p.title AS post_title
+    FROM User u
+    LEFT JOIN Post p
+        ON p.userId = u.id;
+    ```
+  - prisma
+    ```ts
+    const user = await prisma.user.findMany({
+      select: {
+        name: true,
+        posts: {
+          select: {
+            title: true
+          }
+        }
+      }
+    })
+    ```
+##### 관계형 include 옵션
+```ts
+const users = await prisma.user.findMany({
+  where: {
+    role: 'ADMIN'
+  },
+  include: {
+    posts: true
+  }
+})
+```
+```sql
+SELECT 
+    u.*,
+    p.*
+FROM User u
+LEFT JOIN Post p
+    ON p.userId = u.id
+WHERE u.role = 'ADMIN';
+```
+
 </details>
 <br>
 
