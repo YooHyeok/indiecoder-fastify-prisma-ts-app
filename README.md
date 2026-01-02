@@ -1387,6 +1387,76 @@ LEFT JOIN Post p
 WHERE u.role = 'ADMIN';
 ```
 
+### update
+데이터 수정에 해당하는 기능이다.  
+```ts
+prisma.테이블명.update({})
+```
+
+```ts
+const updateUser = await prisma.user.update({
+  where: {
+    id: 99
+  },
+  data: {
+    name: 'Viola the Magnificent'
+  }
+})
+```
+where 속성에 조건을 부여하고, data 속성에 실제 변경할 컬럼과 변경할 값을 기입한다.  
+주의할 점은 update 기능은 단일 로우에 대해서만 수정할 수 있다.  
+만약 where에 정의한 조건 속성이 중복이 가능한 컬럼이라면 오류가 발생하게 된다.  
+따라서 pk나 unique 제약조건이 설정된 컬럼만 조건 속성으로 부여 해야만 정상적으로 수정된다.  
+
+```sql
+UPDATE user SET name='Viola the Magnificent' WHERE email='viola@prisma.io'
+```
+
+#### 벌크 수정: updateMany
+```ts
+const updateUsers = await prisma.user.updateMany({
+  where: {
+    email: {
+      contains: 'prisma.io'
+    }
+  },
+  data: {
+    role: 'ADMIN'
+  }
+})
+```
+
+```sql
+UPDATE user SET role='ADMIN' WHERE email LIKE '%prisma.io';
+```
+
+#### 숫자필드 update 옵션
+- increment: 현재 값에 n을 더함
+- decrement: 현재 값에서 n을 뺌
+- multiply: 현재 값에 n을 곱함.
+- divide: 현재 값을 n으로 나눔.
+- set: 현재 필드 값을 바로 설정. ({ myField: n }과 동일)
+
+##### increment/decrement
+update에서 자주 사용하는 옵션으로 증가와 감소하는 기능을 제공한다.  
+증가시 increment 속성을, 감소시 decrement 속성을 수정할 컬럼에 기입한다.
+
+```ts
+const updatePosts = await prisma.post.updateMany({
+  data: {
+    views: {
+      increment: 1,
+    },
+    likes: {
+      decrement: 1,
+    }
+  }
+})
+```
+```sql
+UPDATE post SET views=views+1, likes=likes-1
+```
+
 </details>
 <br>
 
