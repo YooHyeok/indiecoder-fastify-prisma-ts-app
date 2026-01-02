@@ -1457,6 +1457,45 @@ const updatePosts = await prisma.post.updateMany({
 UPDATE post SET views=views+1, likes=likes-1
 ```
 
+### delete
+값을 삭제하는 기능
+
+#### 기본 문법
+```ts
+prisma.테이블명.delete()
+```
+#### 예제
+- prisma
+  ```ts
+  const deleteUser = await prisma.user.delete({
+    where: {
+      email: 'bert@prisma.io'
+    }
+  })
+  ```
+  where 옵션을 통해삭제 조건을 지정할수도 있다.  
+- sql
+  ```sql
+  DELETE FROM user WHERE email='bert@prisma.io'
+  ```
+
+
+#### 벌크 삭제: deleteMany
+contains와 같은 필터링을 통한 다중 row 삭제만 가능하다.  
+- prisma
+  ```ts
+  const deleteUser = await prisma.user.deleteMany({
+    where: {
+      email: {
+        contains: 'prisma.io'
+      }
+    }
+  })
+  ```
+- sql
+  ```sql
+  DELETE FROM user WHERE email LIKE '%prisma.io'
+  ```
 </details>
 <br>
 
